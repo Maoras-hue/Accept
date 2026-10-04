@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Arina 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,300;1,500&family=Dancing+Script:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #1a0e1f;
+    --bg-2: #2a1330;
+    --rose: #f9a8d4;
+    --rose-deep: #ec4899;
+    --gold: #fcd34d;
+    --text: #fdf2f8;
+    --muted: #c9a8d4;
+    --paper: #fdf6ec;
+    --ink: #3b1f2b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(ellipse at top, var(--bg-2), var(--bg));
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    position: relative;
+  }
+
+  /* Floating hearts background */
+  .hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .heart {
+    position: absolute;
+    font-size: 1.2rem;
+    color: var(--rose);
+    opacity: 0.4;
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(100vh) scale(0.6) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.5; }
+    100% { transform: translateY(-10vh) scale(1) rotate(360deg); opacity: 0; }
+  }
+
+  /* ---------- Envelope stage ---------- */
+  .stage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 620px;
+    perspective: 1500px;
+  }
+
+  .envelope {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    cursor: pointer;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d;
+  }
+  .envelope:hover { transform: translateY(-8px); }
+
+  .env-body {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, #fce7f3, #fbcfe8);
+    border-radius: 12px;
+    box-shadow: 0 30px 80px -20px rgba(236,72,153,0.5),
+                inset 0 -10px 30px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+
+  /* envelope flap */
+  .env-flap {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 55%;
+    background: linear-gradient(180deg, #fbcfe8, #f9a8d4);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform 0.9s cubic-bezier(0.6, 0, 0.3, 1);
+    z-index: 3;
+    box-shadow: inset 0 -8px 20px rgba(0,0,0,0.06);
+  }
+  .envelope.open .env-flap {
+    transform: rotateX(-180deg);
+  }
+
+  /* wax seal */
+  .seal {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 90px; height: 90px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 35% 30%, #f472b6, #be185d 70%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.4rem;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(190,24,93,0.6),
+                inset 0 -4px 10px rgba(0,0,0,0.25),
+                inset 0 4px 10px rgba(255,255,255,0.25);
+    z-index: 4;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+  .envelope.open .seal {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  .envelope-hint {
+    position: absolute;
+    bottom: -3.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+    white-space: nowrap;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+  .envelope.open .envelope-hint { opacity: 0; }
+
+  /* ---------- Letter ---------- */
+  .letter-wrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    z-index: 5;
+    background: rgba(26,14,31,0.85);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    overflow-y: auto;
+  }
+  .letter-wrap.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .letter {
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 660px;
+    width: 100%;
+    padding: 3.5rem 3rem;
+    border-radius: 8px;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
+    position: relative;
+    transform: translateY(40px) scale(0.95);
+    transition: transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(252,211,77,0.06), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(249,168,212,0.08), transparent 40%);
+  }
+  .letter-wrap.show .letter {
+    transform: translateY(0) scale(1);
+  }
+
+  .letter::before {
+    content: '';
+    position: absolute;
+    inset: 1.2rem;
+    border: 1px solid rgba(190,24,93,0.15);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  .letter h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    color: var(--rose-deep);
+    margin-bottom: 1.8rem;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .letter .body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+    line-height: 1.85;
+    color: var(--ink);
+  }
+  .letter .body p { margin-bottom: 1.2rem; }
+  .letter .body p:first-letter {
+    font-size: 1.1em;
+    font-weight: 500;
+  }
+
+  .letter .body em { color: var(--rose-deep); font-style: italic; }
+
+  .letter .signature {
+    margin-top: 2.5rem;
+    text-align: right;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    color: var(--rose-deep);
+  }
+  .letter .signature small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #a0788a;
+    margin-top: 0.5rem;
+  }
+
+  /* The big question */
+  .question {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px dashed rgba(190,24,93,0.25);
+    text-align: center;
+  }
+  .question h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    color: var(--rose-deep);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 0.9rem 2.2rem;
+    border-radius: 50px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+  }
+  .btn-yes {
+    background: linear-gradient(135deg, var(--rose-deep), #f472b6);
+    color: #fff;
+    box-shadow: 0 10px 30px -8px rgba(236,72,153,0.7);
+  }
+  .btn-yes:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px -8px rgba(236,72,153,0.9);
+  }
+  .btn-no {
+    background: #f3d5e2;
+    color: #a0788a;
+    position: relative;
+  }
+
+  /* Celebration */
+  .celebration {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #3d1a45, #1a0e1f);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+    text-align: center;
+    padding: 2rem;
+  }
+  .celebration.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .celebration h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    background: linear-gradient(90deg, var(--rose), var(--gold), var(--rose));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 3s linear infinite;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+  .celebration p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 500px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .celebration .big-heart {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    animation: beat 1.2s ease-in-out infinite;
+  }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.15); }
+  }
+
+  @media (max-width: 560px) {
+    .letter { padding: 2.5rem 1.5rem; }
+    .letter::before { inset: 0.6rem; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- floating hearts -->
+  <div class="hearts" id="hearts"></div>
+
+  <!-- Envelope stage -->
+  <div class="stage">
+    <div class="envelope" id="envelope">
+      <div class="env-body"></div>
+      <div class="env-flap"></div>
+      <div class="seal">A</div>
+      <div class="envelope-hint">click to open</div>
+    </div>
+  </div>
+
+  <!-- Letter -->
+  <div class="letter-wrap" id="letterWrap">
+    <div class="letter">
+      <h1>Dear Arina,</h1>
+      <div class="body">
+        <p>Some feelings are too big for a text message, so I built this little corner of the internet just to tell you something my heart has been holding for a while.</p>
+
+        <p>From the moment you walked into my life, everything felt a little softer. The days got brighter. Songs started making sense. Ordinary moments started feeling like scenes from a movie I never wanted to end. <em>You did that.</em></p>
+
+        <p>I love the way you laugh — not just the sound, but the way it makes the whole room warmer. I love how you care about little things, how you notice when someone's quiet, how you carry so much kindness without even realizing it. I love the way my world feels when you're in it.</p>
+
+        <p>And somewhere between all the conversations, the late nights, and the small moments I keep replaying in my head — I realized something. I don't just want you in my life. <em>I want to be the one who gets to love you properly.</em> Not as a maybe, not as a someday. As your person.</p>
+
+        <p>So here it is, in the simplest words I can find —</p>
+      </div>
+
+      <div class="question">
+        <h2>Arina, will you be my girlfriend?</h2>
+        <div class="buttons">
+          <button class="btn btn-yes" id="yesBtn">Yes 💗</button>
+          <button class="btn btn-no" id="noBtn">No</button>
+        </div>
+      </div>
+
+      <div class="signature">
+        Forever yours,
+        <small>the one who can't stop thinking about you</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebration -->
+  <div class="celebration" id="celebration">
+    <div class="big-heart">💖</div>
+    <h2>She said yes!</h2>
+    <p>You just made me the happiest person alive. Here's to us — and every little moment from now on.</p>
+  </div>
+
+<script>
+  // ---- floating hearts ----
+  const heartsEl = document.getElementById('hearts');
+  const heartChars = ['❤', '💕', '💗', '💖', '🌹'];
+  for (let i = 0; i < 20; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
+    h.style.left = Math.random() * 100 + '%';
+    h.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
+    h.style.animationDuration = (10 + Math.random() * 12) + 's';
+    h.style.animationDelay = (-Math.random() * 20) + 's';
+    heartsEl.appendChild(h);
+  }
+
+  // ---- open envelope ----
+  const envelope = document.getElementById('envelope');
+  const letterWrap = document.getElementById('letterWrap');
+
+  envelope.addEventListener('click', () => {
+    envelope.classList.add('open');
+    setTimeout(() => letterWrap.classList.add('show'), 500);
+  });
+
+  // ---- "No" button runs away ----
+  const noBtn = document.getElementById('noBtn');
+  noBtn.addEventListener('mouseover', () => {
+    const x = (Math.random() - 0.5) * 260;
+    const y = (Math.random() - 0.5) * 160;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  });
+  noBtn.addEventListener('click', () => {
+    // if they actually manage to click it
+    const x = (Math.random() - 0.5) * 300;
+    const y = (Math.random() - 0.5) * 200;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  });
+
+  // ---- Yes ----
+  const yesBtn = document.getElementById('yesBtn');
+  const celebration = document.getElementById('celebration');
+
+  yesBtn.addEventListener('click', () => {
+    letterWrap.classList.remove('show');
+    setTimeout(() => celebration.classList.add('show'), 400);
+
+    // burst hearts
+    burstHearts();
+  });
+
+  function burstHearts() {
+    const colors = ['#ec4899', '#f9a8d4', '#fcd34d', '#f472b6'];
+    for (let i = 0; i < 60; i++) {
+      setTimeout(() => {
+        const h = document.createElement('div');
+        h.textContent = '💖';
+        h.style.position = 'fixed';
+        h.style.left = '50%';
+        h.style.top = '50%';
+        h.style.fontSize = (1 + Math.random() * 2) + 'rem';
+        h.style.pointerEvents = 'none';
+        h.style.zIndex = '30';
+        h.style.transition = 'transform 1.6s cubic-bezier(0.2,0.9,0.3,1), opacity 1.6s ease';
+        document.body.appendChild(h);
+
+        requestAnimationFrame(() => {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 200 + Math.random() * 500;
+          h.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) scale(0.3) rotate(${Math.random()*720}deg)`;
+          h.style.opacity = '0';
+        });
+
+        setTimeout(() => h.remove(), 1800);
+      }, i * 25);
+    }
+  }
+</script>
+</body>
+</html>
